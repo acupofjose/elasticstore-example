@@ -1,7 +1,7 @@
 import React from "react"
 import SyntaxHighlighter from "react-syntax-highlighter"
 
-const SearchResults = ({ results, request }) => {
+const SearchResults = ({ results, request, error }) => {
   return (
     <div className="container is-fluid">
       <div className="columns">
@@ -12,14 +12,15 @@ const SearchResults = ({ results, request }) => {
           </div>
           <div className="my-2">
             <p className="">Response (from firebase `/search` collection fulfilled by elasticstore)</p>
-            <SyntaxHighlighter language="json">{JSON.stringify(results, null, 2)}</SyntaxHighlighter>
+            <SyntaxHighlighter language="json">{JSON.stringify(results || error, null, 2)}</SyntaxHighlighter>
           </div>
         </div>
       </div>
       <div className="columns">
         <div className="column">
           {!results || !results.hits || (!results.hits.length && <div className="subtitle">No Results</div>)}
-          {results.hits &&
+          {results &&
+            results.hits &&
             results.hits.map((hit) => (
               <div className="card my-3" key={hit._id}>
                 <header className="card-header">

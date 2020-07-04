@@ -7,6 +7,7 @@ import SearchResults from "./searchResults"
 
 const SearchPanel = function (props) {
   const [results, setResults] = React.useState({})
+  const [error, setError] = React.useState(null)
   const [request, setRequest] = React.useState({})
   const [isLoading, setIsLoading] = React.useState(false)
   const [query, setQuery] = React.useState("jos*")
@@ -28,8 +29,15 @@ const SearchPanel = function (props) {
 
     const requestDoc = await firebase.firestore().collection("search").add(request)
     const listener = requestDoc.onSnapshot((snap) => {
-      if (snap.data().response) {
-        setResults(snap.data().response.hits)
+      const { response } = snap.data()
+      if (response && response.hits) {
+        setResults(response.hits)
+        setError(null)
+        setIsLoading(false)
+        listener()
+      } else if (response && response.error) {
+        setError(response.error)
+        setResults(null)
         setIsLoading(false)
         listener()
       }
@@ -68,7 +76,7 @@ const SearchPanel = function (props) {
         </div>
       </div>
       <div className="panel-block">
-        <SearchResults request={request} results={results} />
+        <SearchResults request={request} results={results} error={error} />
       </div>
     </>
   )
